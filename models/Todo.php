@@ -1,104 +1,48 @@
 <?php
+class User
+{
+    private $db;
+    private $table = "utilisateurs";
 
-class Todo {
-    private mysqli $db;
-
-    public function __construct(mysqli $db) {
+    public function __construct($db)
+    {
         $this->db = $db;
     }
 
-    /**
-     * Get todos: public todos and secret todos if secret key is valid
-     * @param string|null $secretKey
-     * @return array
-     */
-    public function getTodos(?string $secretKey = null): array {
-        $todos = [];
-
-        // Prepare base query for public todos
-        $query = "SELECT id, title, description, is_secret FROM todos WHERE is_secret = 0";
-
-        $result = $this->db->query($query);
-        if ($result) {
-            while ($row = $result->fetch_assoc()) {
-                $todos[] = $row;
-            }
-        }
-
-        // If secret key is provided and valid, get secret todos
-        if ($secretKey !== null && $this->isValidSecretKey($secretKey)) {
-            $secretQuery = "SELECT id, title, description, is_secret FROM todos WHERE is_secret = 1";
-            $secretResult = $this->db->query($secretQuery);
-            if ($secretResult) {
-                while ($row = $secretResult->fetch_assoc()) {
-                    $todos[] = $row;
-                }
-            }
-        }
-
-        return $todos;
+    public function getAll()
+    {
+        $result = $this->db->query("SELECT * FROM $todo");
+        return $result->fetch_all(MYSQLI_ASSOC);
     }
 
-    /**
-     * Create a new todo
-     * @param string $title
-     * @param string $description
-     * @param bool $isSecret
-     * @return int|null Inserted todo ID or null on failure
-     */
-    public function createTodo(string $title, string $description, bool $isSecret): ?int {
-        $stmt = $this->db->prepare("INSERT INTO todos (title, description, is_secret) VALUES (?, ?, ?)");
-        if (!$stmt) {
-            return null;
-        }
-        $isSecretInt = $isSecret ? 1 : 0;
-        $stmt->bind_param("ssi", $title, $description, $isSecretInt);
-        if ($stmt->execute()) {
-            return $stmt->insert_id;
-        }
-        return null;
-    }
-
-    /**
-     * Update an existing todo
-     * @param int $id
-     * @param string $title
-     * @param string $description
-     * @param bool $isSecret
-     * @return bool Success status
-     */
-    public function updateTodo(int $id, string $title, string $description, bool $isSecret): bool {
-        $stmt = $this->db->prepare("UPDATE todos SET title = ?, description = ?, is_secret = ? WHERE id = ?");
-        if (!$stmt) {
-            return false;
-        }
-        $isSecretInt = $isSecret ? 1 : 0;
-        $stmt->bind_param("ssii", $title, $description, $isSecretInt, $id);
+    public function create($nom, $email, $mot_de_passe)
+    {
+        $hash = password_hash($mot_de_passe, PASSWORD_DEFAULT);
+        $stmt = $this->db->prepare("INSERT INTO $this->table (nom, email, mot_de_passe) VALUES (?, ?, ?)");
+        $stmt->bind_param("sss", $nom, $email, $hash);
         return $stmt->execute();
     }
 
-    /**
-     * Delete a todo by ID
-     * @param int $id
-     * @return bool Success status
-     */
-    public function deleteTodo(int $id): bool {
-        $stmt = $this->db->prepare("DELETE FROM todos WHERE id = ?");
-        if (!$stmt) {
-            return false;
-        }
+    public function findById($id)
+    {
+        $stmt = $this->db->prepare("SELECT * FROM $this->table WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_assoc();
+    }
+
+    public function update($id, $nom, $email, $mot_de_passe)
+    {
+        $hash = password_hash($mot_de_passe, PASSWORD_DEFAULT);
+        $stmt = $this->db->prepare("UPDATE $this->table SET nom = ?, email = ?, mot_de_passe = ? WHERE id = ?");
+        $stmt->bind_param("sssi", $nom, $email, $hash, $id);
+        return $stmt->execute();
+    }
+
+    public function delete($id)
+    {
+        $stmt = $this->db->prepare("DELETE FROM $this->table WHERE id = ?");
         $stmt->bind_param("i", $id);
         return $stmt->execute();
-    }
-
-    /**
-     * Validate the secret key
-     * @param string $secretKey
-     * @return bool
-     */
-    private function isValidSecretKey(string $secretKey): bool {
-        // For simplicity, hardcode a secret key or fetch from config/env
-        $validSecretKey = 'votre_clé_secrète'; // Replace with actual secret key or config
-        return $secretKey === $validSecretKey;
     }
 }

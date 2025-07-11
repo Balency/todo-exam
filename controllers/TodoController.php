@@ -13,12 +13,12 @@ class TodoController {
     }
 
     public function getTodos(): void {
-        $secretKey = null;
-        if (isset($_SERVER['HTTP_SECRET_KEY'])) {
-            $secretKey = $_SERVER['HTTP_SECRET_KEY'];
-        }
+      //  $secretKey = null;
+       // if (isset($_SERVER['HTTP_SECRET_KEY'])) {
+           // $secretKey = $_SERVER['HTTP_SECRET_KEY'];
+       // }
 
-        $todos = $this->model->getTodos($secretKey);
+        $todos = $this->model->getTodos();
         sendResponse($todos);
     }
 
