@@ -9,8 +9,28 @@ $BASE_PATH = '/c:\xampp\htdocs\<nnemete_blondel_fred_exam_final/todo-exam';
 
 $router = new Router($BASE_PATH);
 
+
 $router->add('GET', '/', function () {
     sendResponse(['message' => 'Bienvenue dans l\'API Todo!']);
+});
+
+$todoController = new TodoController();
+
+
+$router->add('GET', '/todos', function () use ($todoController) {
+    $todoController->getTodos();
+});
+
+$router->add('POST', '/todos', function () use ($todoController) {
+    $todoController->createTodo();
+});
+
+$router->add('PUT', '/todos/{id:\d+}', function ($id) use ($todoController) {
+    $todoController->updateTodo((int)$id);
+});
+
+$router->add('DELETE', '/todos/{id:\d+}', function ($id) use ($todoController) {
+    $todoController->deleteTodo((int)$id);
 });
 
 
