@@ -5,7 +5,7 @@ require_once 'config/Router.php';
 require_once 'controllers/TodoController.php';
 
 // Racine de l'API (nom du dossier servi par le serveur web)
-$BASE_PATH = '/c:\xampp\htdocs\<nnemete_blondel_fred_exam_final/todo-exam';
+$BASE_PATH ='/todo-exam';
 
 $router = new Router($BASE_PATH);
 
