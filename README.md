@@ -22,9 +22,9 @@ Une API REST simple de gestion de tâches (todos) en PHP et MySQL, sans authenti
 - **GET /**  
   Message de bienvenue.
 
-- **Endpoints à implémenter**  
+- ** Endpoints à implémenter**  
   - `GET /todos` : Retourne la liste des todos **publics** et **secrets accessibles** si une clé est fournie.  
     - Pour afficher un todo secret, ajoutez un header : `Secret-Key: votre_clé_secrète`
   - `POST /todos` : Crée un nouveau todo.
   - `PUT /todos/{id}` : modifier une todo
-  - `DELETE /todos/{id}` : supprimer une todo
+  - `DELETE /todos/{id}` : supprimer une todo 
